@@ -1,4 +1,5 @@
-import { Application } from "https://deno.land/x/oak@v10.0.0/mod.ts";
+import { Application, send } from "https://deno.land/x/oak@v10.0.0/mod.ts";
+import api from './api.ts';
 
 const app = new Application();
 const PORT = 8080;
@@ -16,37 +17,24 @@ app.use(async (ctx, next) => {
     ctx.response.headers.set("X-Response-Time", `${delta.toString()}ms`);
 })
 
-app.use((ctx) => {
-    ctx.response.body = 
-` 
-                                                                                                          
-                                                                                                          
-NNNNNNNN        NNNNNNNN               AAA                 SSSSSSSSSSSSSSS              AAA               
-N:::::::N       N::::::N              A:::A              SS:::::::::::::::S            A:::A              
-N::::::::N      N::::::N             A:::::A            S:::::SSSSSS::::::S           A:::::A             
-N:::::::::N     N::::::N            A:::::::A           S:::::S     SSSSSSS          A:::::::A            
-N::::::::::N    N::::::N           A:::::::::A          S:::::S                     A:::::::::A           
-N:::::::::::N   N::::::N          A:::::A:::::A         S:::::S                    A:::::A:::::A          
-N:::::::N::::N  N::::::N         A:::::A A:::::A         S::::SSSS                A:::::A A:::::A         
-N::::::N N::::N N::::::N        A:::::A   A:::::A         SS::::::SSSSS          A:::::A   A:::::A        
-N::::::N  N::::N:::::::N       A:::::A     A:::::A          SSS::::::::SS       A:::::A     A:::::A       
-N::::::N   N:::::::::::N      A:::::AAAAAAAAA:::::A            SSSSSS::::S     A:::::AAAAAAAAA:::::A      
-N::::::N    N::::::::::N     A:::::::::::::::::::::A                S:::::S   A:::::::::::::::::::::A     
-N::::::N     N:::::::::N    A:::::AAAAAAAAAAAAA:::::A               S:::::S  A:::::AAAAAAAAAAAAA:::::A    
-N::::::N      N::::::::N   A:::::A             A:::::A  SSSSSSS     S:::::S A:::::A             A:::::A   
-N::::::N       N:::::::N  A:::::A               A:::::A S::::::SSSSSS:::::SA:::::A               A:::::A  
-N::::::N        N::::::N A:::::A                 A:::::AS:::::::::::::::SSA:::::A                 A:::::A 
-NNNNNNNN         NNNNNNNAAAAAAA                   AAAAAAASSSSSSSSSSSSSSS AAAAAAA                   AAAAAAA
-                                                                                                          
-                                                                                                          
-                                                                                                          
-                                                                                                          
-                                                                                                          
-                                                                                                          
-                                                                                                          
-      
-                                        Mission Control API`;
-});
+app.use(api.routes());
+app.use(api.allowedMethods());
+app.use( async (ctx) => {
+    const filepath = ctx.request.url.pathname;
+    
+    const fileWhiteList = [
+        "/index.html",
+        "/javascripts/script.js",
+        "/stylesheets/style.css",
+        "/images/favicon.png",
+    ];
+    if(fileWhiteList.includes(filepath)){
+        await send(ctx, filepath, {
+            root: `${Deno.cwd()}/public`
+        });
+    } 
+})
+
 
 if (import.meta.main) {
     console.log("Starting server at port 8080...");
