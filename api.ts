@@ -55,4 +55,17 @@ router.get("/launches/:id", (ctx) => {
     }
 });
 
+router.post("/launches", async (ctx) => {
+    const body = await ctx.request.body().value;
+    launches.addOne(body);
+    ctx.response.status = 201;
+});
+
+router.delete("/launches/:id", (ctx) => {
+    if(ctx.params?.id){
+        const result = launches.removeOne(Number(ctx.params.id));
+        ctx.response.body = result;
+        ctx.response.status = 200;
+    }
+});
 export default router;
