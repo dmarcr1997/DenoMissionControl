@@ -15,20 +15,14 @@ const launches = new Map<number , Launch>();
 
 await log.setup({
     handlers: {
-        console: new log.handlers.ConsoleHandler("DEBUG"),
-        file: new log.handlers.FileHandler("WARNING", {
-            filename: "./log.txt",
-            // you can change format of output message using any keys in `LogRecord`.
-            formatter: "{levelName} - {msg}",
-        }),
+        console: new log.handlers.ConsoleHandler("INFO"),
     },
     loggers: {
-        // configure default logger available via short-hand methods above.
         default: {
-            level: "DEBUG",
-            handlers: ["console", "file"],
+            level: "INFO",
+            handlers: ["console"]
         },
-    }
+    },
 });
 
 export async function downloadLaunchData() {
